@@ -10,6 +10,7 @@ ENV:=enterprise-gateway-dev
 SHELL:=/bin/bash
 SUPPORTED_ARCHS=linux/arm64 linux/amd64
 PLATFORM_ARCHS=`echo ${SUPPORTED_ARCHS} | sed "s/ /,/g"`
+CONTAINER_MGMT=docker
 
 # Docker attributes - hub organization and tag.  Modify accordingly
 HUB_ORG:=elyra
@@ -153,19 +154,19 @@ $1: ../.image-$1
 	@cp -r docker/$1/* $$(FILES_$1) ../build/docker/$1
 ifdef MULTIARCH_BUILD
 	@echo "starting buildx builder for $1"
-	-@(docker buildx rm $1)
-	(docker buildx create --use --name $1)
-	(cd ../build/docker/$1; docker buildx build ${NO_CACHE} --platform $(PLATFORM_ARCHS) --build-arg HUB_ORG=${HUB_ORG} --build-arg TAG=${TAG} --build-arg SPARK_VERSION=${SPARK_VERSION} -t $(HUB_ORG)/$1:$(TAG) . --push)
+	-@(${CONTAINER_MGMT} buildx rm $1)
+	(${CONTAINER_MGMT} buildx create --use --name $1)
+	(cd ../build/docker/$1; ${CONTAINER_MGMT} buildx build ${NO_CACHE} --platform $(PLATFORM_ARCHS) --build-arg HUB_ORG=${HUB_ORG} --build-arg TAG=${TAG} --build-arg SPARK_VERSION=${SPARK_VERSION} -t $(HUB_ORG)/$1:$(TAG) . --push)
 	@echo "remove builder instance $1"
-	-(docker buildx rm $1)
+	-(${CONTAINER_MGMT} buildx rm $1)
 else ifeq ($(TARGET_ARCH), $(filter $(TARGET_ARCH), $(SUPPORTED_ARCHS)))
-	@echo "Building docker image for $(TARGET_ARCH)"
-	(cd ../build/docker/$1; docker build ${NO_CACHE} --platform ${TARGET_ARCH} --build-arg HUB_ORG=${HUB_ORG} --build-arg TAG=${TAG} --build-arg SPARK_VERSION=${SPARK_VERSION} -t $(HUB_ORG)/$1:$(TAG) .)
-	@-docker images $(HUB_ORG)/$1:$(TAG)
+	@echo "Building ${CONTAINER_MGMT} image for $(TARGET_ARCH)"
+	(cd ../build/docker/$1; ${CONTAINER_MGMT} build ${NO_CACHE} --platform ${TARGET_ARCH} --build-arg HUB_ORG=${HUB_ORG} --build-arg TAG=${TAG} --build-arg SPARK_VERSION=${SPARK_VERSION} -t $(HUB_ORG)/$1:$(TAG) .)
+	@-${CONTAINER_MGMT} images $(HUB_ORG)/$1:$(TAG)
 else
 	@echo "TARGET_ARCH not defined or not in supported platforms: $(PLATFORM_ARCHS). Building docker image for default platform"
-	(cd ../build/docker/$1; docker build ${NO_CACHE} --build-arg HUB_ORG=${HUB_ORG} --build-arg TAG=${TAG} --build-arg SPARK_VERSION=${SPARK_VERSION} -t $(HUB_ORG)/$1:$(TAG) .)
-	@-docker images $(HUB_ORG)/$1:$(TAG)
+	(cd ../build/docker/$1; ${CONTAINER_MGMT} build ${NO_CACHE} --build-arg HUB_ORG=${HUB_ORG} --build-arg TAG=${TAG} --build-arg SPARK_VERSION=${SPARK_VERSION} -t $(HUB_ORG)/$1:$(TAG) .)
+	@-${CONTAINER_MGMT} images $(HUB_ORG)/$1:$(TAG)
 endif
 	@touch ../.image-$1
 endef
@@ -175,13 +176,13 @@ $(foreach image,$(DOCKER_IMAGES),$(eval $(call BUILD_IMAGE,$(image))))
 define CLEAN_IMAGE
 clean-$1:
 	@rm -f ../.image-$1
-	@-docker rmi -f $(HUB_ORG)/$1:$(TAG)
+	@-${CONTAINER_MGMT} rmi -f $(HUB_ORG)/$1:$(TAG)
 endef
 $(foreach image,$(DOCKER_IMAGES),$(eval $(call CLEAN_IMAGE,$(image))))
 
 # Publish each publish image on $(PUSHED_IMAGES) to DockerHub.  Switch 'eval' to 'info' to see what is produced.
 define PUSH_IMAGE
 push-$1:
-	docker push $(HUB_ORG)/$1:$(TAG)
+	${CONTAINER_MGMT} push $(HUB_ORG)/$1:$(TAG)
 endef
 $(foreach image,$(PUSHED_IMAGES),$(eval $(call PUSH_IMAGE,$(image))))
