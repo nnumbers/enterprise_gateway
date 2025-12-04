@@ -87,7 +87,7 @@ $(foreach kernelspec,$(KERNELSPECS),$(eval $(call BUILD_KERNELSPEC,$(kernelspec)
 kernel-launchers/scala/lib: $(TOREE_LAUNCHER_FILES)
 	-rm -rf kernel-launchers/scala/lib
 	mkdir -p kernel-launchers/scala/lib
-	@(cd kernel-launchers/scala/toree-launcher; sbt -Dversion=$(VERSION) -Dspark_version=$(SPARK_VERSION) package; cp target/scala-2.12/*.jar ../lib)
+	@(cd kernel-launchers/scala/toree-launcher; sbt -Dversion=$(VERSION) -Dspark_version=$(SPARK_VERSION) package; cp target/scala-2.13/*.jar ../lib)
 	mvn org.apache.maven.plugins:maven-dependency-plugin:3.3.0:get -DrepoUrl=https://repository.apache.org/content/repositories/releases/ -Dartifact=org.apache.toree:toree-assembly:0.5.0-incubating -Ddest=./etc/kernel-launchers/scala/lib/toree-assembly-0.5.0-incubating.jar
 
 KERNEL_IMAGE_FILE:=../dist/jupyter_enterprise_gateway_kernel_image_files-$(VERSION).tar.gz
