@@ -26,11 +26,11 @@ ENV JAVA_HOME /usr/lib/jvm/java
 RUN ln -s $(readlink -f /usr/bin/javac | sed "s:/bin/javac::") ${JAVA_HOME}
 
 # Download and install Spark
-RUN curl -s https://archive.apache.org/dist/spark/spark-${SPARK_VER}/spark-${SPARK_VER}-bin-hadoop2.7.tgz | \
+RUN curl -s https://archive.apache.org/dist/spark/spark-${SPARK_VER}/spark-${SPARK_VER}-bin-hadoop3.tgz | \
     tar -xz -C /opt && \
-    ln -s ${SPARK_HOME}-${SPARK_VER}-bin-hadoop2.7 $SPARK_HOME && \
+    ln -s ${SPARK_HOME}-${SPARK_VER}-bin-hadoop3 $SPARK_HOME && \
     mkdir -p /usr/hdp/current && \
-    ln -s ${SPARK_HOME}-${SPARK_VER}-bin-hadoop2.7 /usr/hdp/current/spark2-client
+    ln -s ${SPARK_HOME}-${SPARK_VER}-bin-hadoop3 /usr/hdp/current/spark2-client
 
 # Install Enterprise Gateway wheel and kernelspecs
 COPY jupyter_enterprise_gateway*.whl /tmp/
