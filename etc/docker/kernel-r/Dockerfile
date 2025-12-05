@@ -1,5 +1,5 @@
-# Ubuntu 18.04.1 LTS Bionic
-ARG BASE_CONTAINER=jupyter/r-notebook:2023-03-13
+# Ubuntu 24.04 LTS Noble
+ARG BASE_CONTAINER=jupyter/r-notebook:2025-12-03
 FROM $BASE_CONTAINER
 
 RUN conda install --quiet --yes \
