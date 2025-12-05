@@ -1,4 +1,4 @@
-ARG BASE_CONTAINER=jupyter/minimal-notebook:2023-03-13
+ARG BASE_CONTAINER=jupyter/minimal-notebook:2025-12-03
 
 FROM $BASE_CONTAINER
 
