@@ -20,7 +20,7 @@ RUN mamba install --quiet --yes \
 
 USER root
 
-RUN apt update && apt install -yq curl openjdk-8-jdk
+RUN apt update && apt install -yq curl openjdk-17-jdk
 
 ENV JAVA_HOME /usr/lib/jvm/java
 RUN ln -s $(readlink -f /usr/bin/javac | sed "s:/bin/javac::") ${JAVA_HOME}

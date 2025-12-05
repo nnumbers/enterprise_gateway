@@ -19,7 +19,7 @@ RUN dpkg --purge --force-depends ca-certificates-java \
     && apt-get install -y \
     ca-certificates \
     ca-certificates-java \
-    openjdk-8-jdk \
+    openjdk-17-jdk \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
